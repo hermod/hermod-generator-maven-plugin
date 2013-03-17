@@ -1,0 +1,32 @@
+{{#class}}
+package {{implementationPackageName}};
+
+import {{interfacePackageName}}.*;
+
+public final class {{implementationName}} implements {{interfaceName}} 
+{
+
+   public <T> T create(final Class<T> clazz) {
+        final String canonicalName = clazz.getCanonicalName();
+        switch (canonicalName) {
+        {{#classes}}
+        case "{{canonicalInterfaceName}}":
+            return (T) new {{implementationName}}();
+		{{/classes}}
+        default:
+            throw new IllegalArgumentException("Impossible to create Implementation of this Interface Msg" + canonicalName);
+        }
+    }
+    
+    
+{{#classes}}
+    public {{interfaceName}} create{{name}}() 
+    {
+         return new {{implementationName}}();
+    }
+    
+{{/classes}}
+
+
+}
+{{/class}}

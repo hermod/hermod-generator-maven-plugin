@@ -1,0 +1,15 @@
+{{#class}}
+package {{packageName}};
+
+public interface {{name}}  
+{
+{{#fields}}
+    {{type}} get{{capitalizeName}}();
+    
+    void set{{capitalizeName}}(final {{type}} a{{capitalizeName}});
+    
+{{/fields}}
+}
+{{/class}}
+
+

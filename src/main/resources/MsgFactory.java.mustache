@@ -1,0 +1,13 @@
+{{#class}}
+package {{packageName}};
+
+public interface {{name}} 
+{
+    public <T> T create(final Class<T> clazz);
+    
+{{#classes}}
+    {{interfaceName}} create{{name}}();
+    
+{{/classes}}
+}
+{{/class}}

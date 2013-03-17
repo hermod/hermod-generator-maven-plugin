@@ -1,0 +1,11 @@
+{{#class}}
+package {{packageName}};
+
+public interface {{name}}  
+{
+{{#methods}}	{{returnType}} {{name}}({{#parameterTypes}}{{^first}}, {{/first}}{{value}} arg{{index}}{{/parameterTypes}});
+{{/methods}}
+}
+{{/class}}
+
+

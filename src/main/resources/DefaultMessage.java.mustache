@@ -1,0 +1,56 @@
+{{#class}}
+package {{implementationPackageName}};
+
+import com.github.hermod.ser.IMsg;
+import {{interfacePackageName}}.*;
+
+public final class {{implementationName}} extends {{implementationClass}} implements {{interfaceName}}
+{
+    private final static int {{upperName}}_MSGID = {{id}};
+    
+{{#fields}}
+    private final static int {{upperName}}_ID = {{id}};
+{{/fields}}
+
+    public int getMsgId() {
+        return {{upperName}}_MSGID;
+    }
+    
+{{#fields}}
+    @Override
+    public {{type}} get{{capitalizeName}}() 
+    {
+    	{{#isBasicType}}
+        return this.getAs{{capitalizeType}}({{upperName}}_ID);
+        {{/isBasicType}}
+        {{#isEnum}}
+        return {{type}}.values()[this.getAsByte({{upperName}}_ID)];
+        {{/isEnum}}
+        {{#isMessage}}
+        final {{prefixImplementationName}}{{type}} aMsg = new {{prefixImplementationName}}{{type}}();
+        this.getAsMsg({{upperName}}_ID, (IMsg) aMsg);
+        return ({{type}}) aMsg;
+        {{/isMessage}}
+    }
+    
+    @Override
+    public void set{{capitalizeName}}(final {{type}} a{{capitalizeName}}) 
+    {
+        {{#isBasicType}}
+        this.set({{upperName}}_ID, a{{capitalizeName}});
+        {{/isBasicType}}
+        {{#isEnum}}
+        this.set({{upperName}}_ID, a{{capitalizeName}}.ordinal());
+        {{/isEnum}}
+		{{#isMessage}}
+	    if (a{{capitalizeName}} instanceof IMsg) 
+        {
+            this.set({{upperName}}_ID, (IMsg) a{{capitalizeName}});
+        }
+		{{/isMessage}}
+    }
+    
+{{/fields}}
+}
+{{/class}}
+
