@@ -22,5 +22,5 @@ public interface Parser {
      * @param aName TODO
      * @return
      */
-    public ClassContainerDescriptor parse(final String modelName, final String packageToScan, final String aClassPrefix, final String aClassSuffix, final String aPackageToAdd, final String aName, final String aImplementationClass);
+    public ClassContainerDescriptor parse(final String modelName, final String packageToScan, final String aPrefixImplementationName, final String aPrefixInterfaceName, final String aPackageToAdd, final String aName, final String aImplementationClass);
 }

@@ -1,6 +1,8 @@
 package com.github.hermod.generator.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -55,7 +57,7 @@ public class ClassDescriptor {
         this.fields = aFields;
         this.methods = aMethods;
         this.responseMessages = aResponseMessages;
-        validate();
+        //validate();
 
     }
 
@@ -65,24 +67,42 @@ public class ClassDescriptor {
      * @param aFields
      * @throws IllegalArgumentException
      */
-    private void validate() throws IllegalArgumentException {
-
+    public List<String> validate() /*throws IllegalArgumentException*/ {
+        final List<String> errors = new ArrayList<>();
         for (final FieldDescriptor fieldDescriptor : this.fields) {
-            Preconditions.checkArgument(fieldDescriptor.getId() >= 0, "The field Id is %s but must >= 0 for message %s", fieldDescriptor.getId(),
-                    this.getImplementationName());
-            Preconditions.checkArgument(fieldDescriptor.getName().matches("^[a-zA-Z][a-zA-Z0-9]*?$"),
-                    "The field Name is %s but must match ^[a-zA-Z][a-zA-Z0-9]*?$ for message %s", fieldDescriptor.getName(),
-                    this.getImplementationName());
+//            Preconditions.checkArgument(fieldDescriptor.getId() >= 0, "The field Id is %s but must >= 0 for message %s", fieldDescriptor.getId(),
+//                    this.getImplementationName());
+            if (fieldDescriptor.getId() < 0) {
+                errors.add(String.format("The field Id is %s but must >= 0 for message %s", fieldDescriptor.getId(),
+                        this.getImplementationName()));
+            }
+//            Preconditions.checkArgument(fieldDescriptor.getName().matches("^[a-zA-Z][a-zA-Z0-9]*?$"),
+//                    "The field Name is %s but must match ^[a-zA-Z][a-zA-Z0-9]*?$ for message %s", fieldDescriptor.getName(),
+//                    this.getImplementationName());
+            if (!fieldDescriptor.getName().matches("^[a-zA-Z][a-zA-Z0-9]*?$")) {
+                errors.add(String.format("The field Name is %s but must match ^[a-zA-Z][a-zA-Z0-9]*?$ for message %s", fieldDescriptor.getName(),
+                        this.getImplementationName()));
+            }
         }
 
         final Map<Integer, FieldDescriptor> idMap = Maps.newHashMap();
         for (final FieldDescriptor fieldDescriptor : this.fields) {
-            Preconditions.checkArgument(!idMap.containsKey(fieldDescriptor.getId()),
-                    "The field Id is %s for field %s is already used for field %s, it must be unique for message %s", fieldDescriptor.getId(),
-                    fieldDescriptor.getName(), idMap.get(fieldDescriptor.getId()) != null ? idMap.get(fieldDescriptor.getId()).getName() : "",
-                    this.name);
+//            Preconditions.checkArgument(!idMap.containsKey(fieldDescriptor.getId()),
+//                    "The field Id is %s for field %s is already used for field %s, it must be unique for message %s", fieldDescriptor.getId(),
+//                    fieldDescriptor.getName(), idMap.get(fieldDescriptor.getId()) != null ? idMap.get(fieldDescriptor.getId()).getName() : "",
+//                    this.name);
+            if (idMap.containsKey(fieldDescriptor.getId())) {
+                errors.add(String.format("The field Id is %s for field %s is already used for field %s, it must be unique for message %s", fieldDescriptor.getId(),
+                        fieldDescriptor.getName(), idMap.get(fieldDescriptor.getId()) != null ? idMap.get(fieldDescriptor.getId()).getName() : "",
+                                this.name));
+            }
+            
             idMap.put(fieldDescriptor.getId(), fieldDescriptor);
+            
+            errors.addAll(fieldDescriptor.validate());
         }
+        
+        return errors;
     }
 
     /**

@@ -1,7 +1,7 @@
 package com.github.hermod.generator;
 
-import com.github.hermod.ser.descriptor.Field;
-import com.github.hermod.ser.descriptor.Message;
+import com.github.hermod.ser.descriptor.AField;
+import com.github.hermod.ser.descriptor.AMessage;
 
 /**
  * <p>MyMessage. </p>
@@ -9,7 +9,7 @@ import com.github.hermod.ser.descriptor.Message;
  * @author anavarro - Mar 10, 2013
  *
  */
-@Message(id=2)
+@AMessage(id=2)
 public interface ResponseMsg {
     
     /**
@@ -17,12 +17,12 @@ public interface ResponseMsg {
      *
      * @return
      */
-    @Field(id=1, name="name")
+    @AField(id=1, name="name")
     String getName();
     
     void setName(String aName);
     
-    @Field(id=2, name="qty")
+    @AField(id=2, name="qty")
     int getQty();
     
     void setQty(int aQty);

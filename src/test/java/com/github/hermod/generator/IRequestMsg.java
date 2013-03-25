@@ -1,7 +1,7 @@
 package com.github.hermod.generator;
 
-import com.github.hermod.ser.descriptor.Field;
-import com.github.hermod.ser.descriptor.Message;
+import com.github.hermod.ser.descriptor.AField;
+import com.github.hermod.ser.descriptor.AMessage;
 
 /**
  * <p>MyMessage. </p>
@@ -9,7 +9,7 @@ import com.github.hermod.ser.descriptor.Message;
  * @author anavarro - Mar 10, 2013
  *
  */
-@Message(id=1, name = "RequestMsg", responseMessages = {ResponseMsg.class})
+@AMessage(id=1, name = "RequestMsg", responseMessages = {ResponseMsg.class})
 public interface IRequestMsg {
     
     
@@ -18,23 +18,23 @@ public interface IRequestMsg {
      *
      * @return
      */
-    @Field(id=1, name="name")
+    @AField(id=1, name="name")
     String getName();
     
     void setName(String aName);
     
-    @Field(id=2, name="requestId")
+    @AField(id=2, name="requestId")
     int getRequestId();
     
     
     void setRequestId(int requestId);
     
-    @Field(id=3, name="status")
+    @AField(id=3, name="status")
     Status getStatus();
     
     void setStatus(Status status);
     
-    @Field(id=4, name="parameter")
+    @AField(id=4, name="parameter")
     Parameter getParameter();
     
     void setParameter(Parameter parameter);

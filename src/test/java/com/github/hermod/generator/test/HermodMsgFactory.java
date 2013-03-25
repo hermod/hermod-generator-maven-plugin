@@ -2,7 +2,6 @@ package com.github.hermod.generator.test;
 
 import com.github.hermod.generator.IRequestMsg;
 import com.github.hermod.generator.ResponseMsg;
-import com.github.hermod.ser.IMsg;
 
 /**
  * <p>HermodMsgFactory. </p>

@@ -8,11 +8,10 @@
 	</parent>
 	<artifactId>hermod-generator-maven-plugin</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-
 	<packaging>maven-plugin</packaging>
 	<properties>
 		<projectUrl>${parentUrl}</projectUrl>
-		<mavenVersion>3.0.5</mavenVersion>
+		<mavenVersion>3.0.0</mavenVersion>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -33,12 +32,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>14.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.reflections</groupId>
-			<artifactId>reflections</artifactId>
-			<version>0.9.8</version>
+			<version>14.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.reflections</groupId>
@@ -65,27 +59,30 @@
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-plugin-api</artifactId>
-			<version>${mavenVersion}</version>
+			<version>3.0.5</version>
 		</dependency>
+
+		<!--dependency> <groupId>org.apache.maven</groupId> <artifactId>maven-model</artifactId> 
+			<version>${mavenVersion}</version> </dependency> <dependency> <groupId>org.apache.maven</groupId> 
+			<artifactId>maven-artifact</artifactId> <version>${mavenVersion}</version> 
+			</dependency -->
+		<!-- dependencies to annotations -->
 		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-model</artifactId>
-			<version>${mavenVersion}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-artifact</artifactId>
-			<version>${mavenVersion}</version>
+			<groupId>org.apache.maven.plugin-tools</groupId>
+			<artifactId>maven-plugin-annotations</artifactId>
+			<version>3.0</version>
 		</dependency>
 		<!--dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-project</artifactId>
-			<version>${mavenVersion}</version>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-utils</artifactId>
+			<version>3.0.1</version>
 		</dependency-->
+		<!--dependency> <groupId>org.apache.maven</groupId> <artifactId>maven-project</artifactId> 
+			<version>${mavenVersion}</version> </dependency -->
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<scope>runtime</scope>
+			<!--scope>runtime</scope-->
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -94,4 +91,34 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-plugin-plugin</artifactId>
+				<version>3.2</version>
+				<configuration>
+					<!-- see http://jira.codehaus.org/browse/MNG-5346 -->
+					<skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+				</configuration>
+				<executions>
+					<execution>
+						<id>mojo-descriptor</id>
+						<goals>
+							<goal>descriptor</goal>
+						</goals>
+					</execution>
+					<!-- if you want to generate help goal -->
+					<execution>
+						<id>help-goal</id>
+						<goals>
+							<goal>helpmojo</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+
+	</build>
 </project>

@@ -1,12 +1,5 @@
 package com.github.hermod.generator.test;
 
-import org.reflections.serializers.Serializer;
-
-import com.github.hermod.generator.IRequestMsg;
-import com.github.hermod.generator.Parameter;
-import com.github.hermod.generator.Status;
-import com.github.hermod.ser.IMsg;
-import com.github.hermod.ser.impl.KeyObjectMsg;
 
 /**
  * <p>RequestParam. </p>
@@ -14,9 +7,9 @@ import com.github.hermod.ser.impl.KeyObjectMsg;
  * @author anavarro - Mar 12, 2013
  * 
  */
-public class HermodRequestMsg extends KeyObjectMsg implements IRequestMsg {
+public class HermodRequestMsg { //extends KeyObjectMsg implements IRequestMsg {
 
-    
+  /*  
     private final static int NAME_ID = 1;
     private final static int REQUEST_ID = 2;
     private final static int STATUS_ID = 3;
@@ -67,7 +60,7 @@ public class HermodRequestMsg extends KeyObjectMsg implements IRequestMsg {
         }
     }
     
-    
+    */
     
     
 

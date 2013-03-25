@@ -1,12 +1,13 @@
 package com.github.hermod.generator.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.hermod.ser.IMsg;
-import com.github.hermod.ser.descriptor.Message;
+import com.github.hermod.ser.descriptor.AMessage;
 import com.google.common.base.Preconditions;
 
 /**
@@ -24,12 +25,14 @@ public final class FieldDescriptor {
     private final String packageName;
     private final boolean mandatory;
     private final boolean isEnum;
+    private final boolean isArray;
     private final boolean isBasicType;
     private final boolean isMessage;
     
     
     //TODO maybe move in hermod-ser
-    private final List<Class<?>> MANAGED_TYPES = Arrays.<Class<?>>asList(byte.class, short.class, int.class, long.class, String.class);
+    private final List<Class<?>> BASIC_MANAGED_TYPES = Arrays.<Class<?>>asList(boolean.class, byte.class, short.class, int.class, long.class, double.class, float.class, String.class);
+
     
     /**
      * Constructor.
@@ -48,10 +51,19 @@ public final class FieldDescriptor {
         this.mandatory = aMandatory;
         this.type = aClazz.getSimpleName();
         this.packageName = aClazz.getPackage() != null ? aClazz.getPackage().getName() : "";
-        this.isEnum = aClazz.isEnum();
-        this.isBasicType = MANAGED_TYPES.contains(aClazz) ? true : false;
-        this.isMessage =  (aClazz.getAnnotation(Message.class) != null || Arrays.<Class<?>>asList(aClazz.getInterfaces()).contains(IMsg.class)) ? true : false;
-        this.validate();
+        this.isArray = aClazz.isArray();
+        if (!aClazz.isArray()) {
+            this.isEnum = aClazz.isEnum();
+            this.isBasicType = BASIC_MANAGED_TYPES.contains(aClazz) ? true : false;
+            this.isMessage =  (aClazz.getAnnotation(AMessage.class) != null || Arrays.<Class<?>>asList(aClazz.getInterfaces()).contains(IMsg.class)) ? true : false;
+        } else {
+            Class classInsideArray = aClazz.getComponentType();
+            this.isEnum = classInsideArray.isEnum();
+            this.isBasicType = BASIC_MANAGED_TYPES.contains(classInsideArray) ? true : false;
+            this.isMessage = (classInsideArray.getAnnotation(AMessage.class) != null || Arrays.<Class<?>>asList(classInsideArray.getInterfaces()).contains(IMsg.class)) ? true : false;
+        }
+         
+        //this.validate();
     }
 
     
@@ -59,8 +71,13 @@ public final class FieldDescriptor {
      * validate.
      *
      */
-    private void validate() {
-        Preconditions.checkArgument(this.isEnum || this.isBasicType || this.isMessage, "The type=%s for field name=%s must be a BasicType (%s) or an Enum or a Message", this.type, this.name, this.MANAGED_TYPES.toString());
+    public List<String> validate() {
+        final List<String> errors = new ArrayList<>();
+        //Preconditions.checkArgument(this.isEnum || this.isBasicType || this.isMessage, "The type=%s for field name=%s must be a BasicType (%s) or an Enum or a Message", this.type, this.name, this.BASIC_MANAGED_TYPES.toString());
+        if (! (this.isEnum || this.isBasicType || this.isMessage)) {
+            errors.add(String.format("The type=%s for field name=%s must be a BasicType (%s) or an Enum or a Message", this.type, this.name, this.BASIC_MANAGED_TYPES.toString()));
+        }
+        return errors;
     }
     
 
@@ -143,7 +160,16 @@ public final class FieldDescriptor {
     }
 
     
-    
+    /**
+     * isArray.
+     *
+     * @return
+     */
+    public boolean isArray() {
+        return this.isArray;
+    }
+
+
     /**
      * isEnum.
      *
@@ -231,9 +257,6 @@ public final class FieldDescriptor {
         return "FieldDescriptor [name=" + this.name + ", id=" + this.id + ", docName=" + this.docName + ", type=" + this.type + ", mandatory="
                 + this.mandatory + "]";
     }
-    
-
-    
     
 
 }

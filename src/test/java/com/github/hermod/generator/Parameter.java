@@ -1,8 +1,9 @@
 package com.github.hermod.generator;
 
-import com.github.hermod.ser.descriptor.Message;
+import com.github.hermod.ser.descriptor.AMessage;
 
-@Message(id=3)
+
+@AMessage(id=3)
 public interface Parameter {
 
 }

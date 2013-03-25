@@ -1,6 +1,6 @@
 package com.github.hermod.generator;
 
-import com.github.hermod.ser.descriptor.InterfaceApi;
+import com.github.hermod.ser.descriptor.AInterface;
 
 /**
  * <p>InterfaceApiTest. </p>
@@ -8,7 +8,7 @@ import com.github.hermod.ser.descriptor.InterfaceApi;
  * @author anavarro - Mar 9, 2013
  *
  */
-@InterfaceApi
+@AInterface
 public interface InterfaceApiTest {
 
     /**
