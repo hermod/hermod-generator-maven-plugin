@@ -1,5 +1,6 @@
 package com.github.hermod.generator;
 
+import java.io.File;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -51,26 +52,42 @@ public final class HermodGeneratorDemo {
         final Validator<ClassContainerDescriptor> validator = new ClassContainerDescriptorValidator();
         final Generator generator = new MustacheGenerator();
    
-        final String interfaceTemplateFileName = "InterfaceApi.java.mustache";
-        final ClassContainerDescriptor classContainerDescriptor = classParser.parse(AInterface.class.getCanonicalName(), packageToScan, "", prefixInterfaceClass, suffixImplementationPackage, StringUtils.substringBefore(interfaceTemplateFileName, "."), serializedImplementationClass);
-        final List<String> errors = validator.validate(classContainerDescriptor);
-        generator.generateSourceClasses(classContainerDescriptor, outputDir, interfaceTemplateFileName, generateFileForEachClass, ClassType.INTERFACE);
-   
+        
+
+        
+//        final String interfaceTemplateFileName = "Interface.java.mustache";
+//        final ClassContainerDescriptor classContainerDescriptor = classParser.parse(AMessage.class.getCanonicalName(), packageToScan, "", prefixInterfaceClass, suffixImplementationPackage, StringUtils.substringBefore(interfaceTemplateFileName, "."), serializedImplementationClass);
+//        final List<String> errors = validator.validate(classContainerDescriptor);
+//   
+        
+        final ClassContainerDescriptor classContainerDescriptor = classParser.parse(modelName, packageToScan, "",
+                "", "", StringUtils.substringAfterLast(StringUtils.substringBefore("/home/anavarro/workspace/hermod-generator-maven-plugin-sampleb/messages-doc.xdoc.mustache", "."), File.separator),
+                "");
+        
+        generator.generateSourceClasses(classContainerDescriptor, outputDir, false,
+                "/home/anavarro/workspace/hermod-generator-maven-plugin-sampleb/messages-doc.xdoc.mustache", true, ClassType.BASIC);
+        
+        
+        /*
+        
+        generator.generateSourceClasses(classContainerDescriptor, outputDir, true, interfaceTemplateFileName, generateFileForEachClass, ClassType.INTERFACE);
+        
+        
         
         
         final String messageTemplateFileName = "Message.java.mustache";
-        generator.generateSourceClasses(classParser.parse(AMessage.class.getCanonicalName(), packageToScan, prefixInterfaceClass, "", suffixImplementationPackage, StringUtils.substringBefore(messageTemplateFileName, "."), serializedImplementationClass), outputDir, messageTemplateFileName, generateFileForEachClass, ClassType.INTERFACE);
+        generator.generateSourceClasses(classParser.parse(AMessage.class.getCanonicalName(), packageToScan, prefixInterfaceClass, "", suffixImplementationPackage, StringUtils.substringBefore(messageTemplateFileName, "."), serializedImplementationClass), outputDir, true, messageTemplateFileName, generateFileForEachClass, ClassType.INTERFACE);
         
         final String defaultMessageTemplateFileName = "DefaultMessage.java.mustache";
-        generator.generateSourceClasses(classParser.parse(AMessage.class.getCanonicalName(), packageToScan, prefixImplementationClass, "", "hermod", StringUtils.substringBefore(defaultMessageTemplateFileName, "."), serializedImplementationClass), outputDir, defaultMessageTemplateFileName, generateFileForEachClass, ClassType.CLASS);
+        generator.generateSourceClasses(classParser.parse(AMessage.class.getCanonicalName(), packageToScan, prefixImplementationClass, "", "hermod", StringUtils.substringBefore(defaultMessageTemplateFileName, "."), serializedImplementationClass), outputDir, true, defaultMessageTemplateFileName, generateFileForEachClass, ClassType.CLASS);
    
         
         final String msgFactoryTemplateFileName = "MsgFactory.java.mustache";
-        generator.generateSourceClasses(classParser.parse(AMessage.class.getCanonicalName(), packageToScan, "", "", suffixImplementationPackage, StringUtils.substringBefore(msgFactoryTemplateFileName, "."), serializedImplementationClass), outputDir, msgFactoryTemplateFileName, false, ClassType.INTERFACE);
+        generator.generateSourceClasses(classParser.parse(AMessage.class.getCanonicalName(), packageToScan, "", "", suffixImplementationPackage, StringUtils.substringBefore(msgFactoryTemplateFileName, "."), serializedImplementationClass), outputDir, true, msgFactoryTemplateFileName, false, ClassType.INTERFACE);
 
         final String defaultMsgFactoryTemplateFileName = "DefaultMsgFactory.java.mustache";
-        generator.generateSourceClasses(classParser.parse(AMessage.class.getCanonicalName(), packageToScan, "Hermod", "", "hermod", "MsgFactory", serializedImplementationClass), outputDir, defaultMsgFactoryTemplateFileName, false, ClassType.CLASS);
-
+        generator.generateSourceClasses(classParser.parse(AMessage.class.getCanonicalName(), packageToScan, "Hermod", "", "hermod", "MsgFactory", serializedImplementationClass), outputDir, true, defaultMsgFactoryTemplateFileName, false, ClassType.CLASS);
+*/
         
     }
 

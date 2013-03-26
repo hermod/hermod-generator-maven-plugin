@@ -23,6 +23,7 @@ public class ClassDescriptor {
     private final String packageName;
     private final int id;
     private final String docName;
+    private final String docComment;
     private final String prefixImplementationName;
     private final String prefixInterfaceName;
     private final String serializableImplementationClass;
@@ -39,17 +40,19 @@ public class ClassDescriptor {
      * @param aPackageName
      * @param aId
      * @param aDocName
+     * @param aDocComment TODO
      * @param aSuffixImplementationPackageName TODO
      * @param aFields
      */
     public ClassDescriptor(final String aName, final String aPackageName, final int aId, final String aDocName,
-            final String aPrefixImplementationName, final String aPrefixInterfaceName, final String aSuffixImplementationPackageName,
-            final String aserializableImplementationClass, final Collection<FieldDescriptor> aFields, final Collection<MethodDescriptor> aMethods, final Collection<ClassDescriptor> aResponseMessages) {
+            final String aDocComment, final String aPrefixImplementationName, final String aPrefixInterfaceName,
+            final String aSuffixImplementationPackageName, final String aserializableImplementationClass, final Collection<FieldDescriptor> aFields, final Collection<MethodDescriptor> aMethods, final Collection<ClassDescriptor> aResponseMessages) {
         super();
         this.name = aName;
         this.packageName = aPackageName;
         this.id = aId;
         this.docName = aDocName;
+        this.docComment = aDocComment;
         this.prefixImplementationName = aPrefixImplementationName;
         this.prefixInterfaceName = aPrefixInterfaceName;
         this.serializableImplementationClass = aserializableImplementationClass;
@@ -126,8 +129,10 @@ public class ClassDescriptor {
             return getInterfaceName();
         case CLASS:
             return getImplementationName();
+        case BASIC:
+            return getName();
         default:
-            return getImplementationName();
+            return getName();
         }
     }
 
@@ -254,6 +259,12 @@ public class ClassDescriptor {
      */
     public String getDocName() {
         return this.docName;
+    }
+    
+    
+
+    public String getDocComment() {
+        return this.docComment;
     }
 
     /**

@@ -21,6 +21,7 @@ public final class FieldDescriptor {
     private final String name;
     private final int id;
     private final String docName;
+    private final String docComment;
     private final String type;
     private final String packageName;
     private final boolean mandatory;
@@ -40,14 +41,16 @@ public final class FieldDescriptor {
      * @param aName
      * @param aId
      * @param aDocName
+     * @param aDocComment TODO
      * @param aType
      * @param aMandatory
      */
-    public FieldDescriptor(String aName, int aId, String aDocName, String aType, boolean aMandatory, Class<?> aClazz) {
+    public FieldDescriptor(String aName, int aId, String aDocName, String aDocComment, String aType, boolean aMandatory, Class<?> aClazz) {
         super();
         this.name = aName;
         this.id = aId;
         this.docName = aDocName;
+        this.docComment = aDocComment;
         this.mandatory = aMandatory;
         this.type = aClazz.getSimpleName();
         this.packageName = aClazz.getPackage() != null ? aClazz.getPackage().getName() : "";

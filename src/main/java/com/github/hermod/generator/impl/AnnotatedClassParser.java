@@ -80,11 +80,13 @@ public final class AnnotatedClassParser implements Parser {
         String name = clazz.getSimpleName();
         final AMessage message = clazz.getAnnotation(AMessage.class);
         String docName = "";
+        String docComment = "";
         Class<?>[] responseMessageClasses = {};
         if (message != null) {
             id = message.id();
             name = ("".equals(message.name())) ? clazz.getSimpleName() : message.name();
             docName = message.docName();
+            docComment = message.docComment();
             responseMessageClasses = message.responseMessages();
         }
         else {
@@ -99,8 +101,8 @@ public final class AnnotatedClassParser implements Parser {
             final AField field = method.getAnnotation(AField.class);
             if (field != null) {
                 final Class<?> returnType = method.getReturnType();
-                final FieldDescriptor fieldDescriptor = new FieldDescriptor(field.name(), field.id(), field.docName(), getAdequateName(
-                        returnType, packageName), field.mandatory(), returnType);
+                final FieldDescriptor fieldDescriptor = new FieldDescriptor(field.name(), field.id(), field.docName(), field.docComment(), getAdequateName(
+                                returnType, packageName), field.mandatory(), returnType);
                 fieldDescriptors.add(fieldDescriptor);
             }
             
@@ -123,7 +125,7 @@ public final class AnnotatedClassParser implements Parser {
                     aSerializedImplementationClass, i, responseMessageClass));
         }
 
-        final ClassDescriptor messageDescriptor = new ClassDescriptor(name, packageName, id, docName, aPrefixImplementationName, aPrefixInterfaceName, aPackageToAdd, aSerializedImplementationClass, fieldDescriptors, methodDescriptors, responseMessages);
+        final ClassDescriptor messageDescriptor = new ClassDescriptor(name, packageName, id, docName, docComment, aPrefixImplementationName, aPrefixInterfaceName, aPackageToAdd, aSerializedImplementationClass, fieldDescriptors, methodDescriptors, responseMessages);
         return messageDescriptor;
     }
 

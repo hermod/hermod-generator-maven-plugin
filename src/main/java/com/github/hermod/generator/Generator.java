@@ -14,10 +14,11 @@ public interface Generator {
     /**
      * generateClasses.
      * @param outputDir
+     * @param generatePackageInOutputDir TODO
      * @param templateFileName
      * @param aGeneratedClassType TODO
      * @param classDescriptors
      */
-    public void generateSourceClasses(final ClassContainerDescriptor classContainerDescriptor, final String outputDir, final String templateFileName, final boolean generateOneFileForEachClass, final ClassType aGeneratedClassType);
+    public void generateSourceClasses(final ClassContainerDescriptor classContainerDescriptor, final String outputDir, boolean generatePackageInOutputDir, final String templateFileName, final boolean generateOneFileForEachClass, final ClassType aGeneratedClassType);
     
 }

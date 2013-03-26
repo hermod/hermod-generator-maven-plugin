@@ -31,7 +31,7 @@ public final class ClassContainerDescriptor extends ClassDescriptor {
      * @param aPackageName
      */
     public ClassContainerDescriptor(final String aName, final int aId, final String aPrefixImplementationName, final String aPrefixInterfaceName, String aSuffixImplementationPackageName, String aSerializableImplementationClass, final List<ClassDescriptor> aClasses, final String aPackageName) {
-        super(aName, aPackageName, aId, "", aPrefixImplementationName, aPrefixInterfaceName, aSuffixImplementationPackageName, aSerializableImplementationClass, Collections.<FieldDescriptor> emptyList(), Collections.<MethodDescriptor> emptyList(), Collections.<ClassDescriptor> emptyList());
+        super(aName, aPackageName, aId, "", "", aPrefixImplementationName, aPrefixInterfaceName, aSuffixImplementationPackageName, aSerializableImplementationClass, Collections.<FieldDescriptor> emptyList(), Collections.<MethodDescriptor> emptyList(), Collections.<ClassDescriptor> emptyList());
         this.classes = aClasses;
         //this.validate();
     }

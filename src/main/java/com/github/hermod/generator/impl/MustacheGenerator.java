@@ -2,9 +2,11 @@ package com.github.hermod.generator.impl;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,15 +77,16 @@ public final class MustacheGenerator implements Generator {
      * @param aTemplateFileName
      * @param generateOneFileForEachClasses
      */
-    public void generateSourceClasses(final ClassContainerDescriptor classContainerDescriptor, String aOutputDir, String aTemplateFileName,
-            boolean generateOneFileForEachClass, final ClassType aGeneratedClassType) {
+    public void generateSourceClasses(final ClassContainerDescriptor classContainerDescriptor, String aOutputDir,
+            boolean generatePackageLayoutInOutputDir, String aTemplateFileName, boolean generateOneFileForEachClass,
+            final ClassType aGeneratedClassType) {
         LOGGER.info("MustacheGenerator.generateClasses started.");
         if (generateOneFileForEachClass) {
             for (final ClassDescriptor aClassDescription : classContainerDescriptor.getClasses()) {
-                generateSourceClass(aClassDescription, aOutputDir, aTemplateFileName, aGeneratedClassType);
+                generateSourceClass(aClassDescription, aOutputDir, generatePackageLayoutInOutputDir, aTemplateFileName, aGeneratedClassType);
             }
         } else {
-            generateSourceClass(classContainerDescriptor, aOutputDir, aTemplateFileName, aGeneratedClassType);
+            generateSourceClass(classContainerDescriptor, aOutputDir, generatePackageLayoutInOutputDir, aTemplateFileName, aGeneratedClassType);
         }
 
         LOGGER.info("MustacheGenerator.generateClasses ended.");
@@ -94,9 +97,11 @@ public final class MustacheGenerator implements Generator {
      * 
      * @param classDescriptor
      * @param outputDir
+     * @param generatePackageLayoutInOutputDir TODO
      * @param templateFileName
      */
-    public void generateSourceClass(final ClassDescriptor classDescriptor, final String outputDir, final String templateFileName, final ClassType aGeneratedClassType) {
+    public void generateSourceClass(final ClassDescriptor classDescriptor, final String outputDir, boolean generatePackageLayoutInOutputDir,
+            final String templateFileName, final ClassType aGeneratedClassType) {
 
         final Map<String, Object> scopeMap = new HashMap<String, Object>();
         scopeMap.put("capitalize", this.capitalizeFunction);
@@ -109,18 +114,28 @@ public final class MustacheGenerator implements Generator {
                     .checkArgument(splitTemplateFileName.size() == 3,
                             "The templateFileName must have 2 points (ended .mustache) to determine the extention of the file. Ex : interface-api.java.mustache.");
             final String extension = "." + splitTemplateFileName.get(1);
-            final String fileName = outputDir + File.separator + classDescriptor.getPackageName(aGeneratedClassType).replace(".", File.separator) + File.separator
+            
+            final String fileName = outputDir + File.separator + ((generatePackageLayoutInOutputDir) ? classDescriptor.getPackageName(aGeneratedClassType).replace(".", File.separator) + File.separator : "")
                     + classDescriptor.getName(aGeneratedClassType) + extension;
             Files.createParentDirs(new File(fileName));
             final Writer writer = new OutputStreamWriter(new FileOutputStream(fileName));
             final MustacheFactory mf = new DefaultMustacheFactory();
 
-            final Mustache mustache = mf.compile(templateFileName);
+            Mustache mustache = null;
+            if (Thread.currentThread().getContextClassLoader().getResource(templateFileName) == null) {
+                final File file = new File(templateFileName);
+                if (file.exists()) {
+                    mustache = mf.compile(new FileReader(file), file.getName());
+                } else {
+                    throw new IllegalArgumentException("The file " + file + " does not exist. You must specify a real file.");
+                }
+            } else {
+                mustache = mf.compile(templateFileName);
+            }
             mustache.execute(writer, scopeMap);
             writer.flush();
             LOGGER.info(fileName + " generated.");
         } catch (IOException e) {
-            //
             LOGGER.warn("Impossible to generate e=", e);
         }
 

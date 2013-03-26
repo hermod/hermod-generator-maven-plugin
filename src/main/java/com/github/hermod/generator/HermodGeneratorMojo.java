@@ -21,9 +21,9 @@ import com.github.hermod.generator.model.ClassContainerDescriptor;
  * @author anavarro - Mar 20, 2013
  * 
  */
-@Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES ,
-requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME,
-requiresDependencyCollection = ResolutionScope.COMPILE_PLUS_RUNTIME) // (since Maven 3.0))
+@Mojo(name = "generateInterfaceImplementation", defaultPhase = LifecyclePhase.GENERATE_SOURCES ,
+requiresDependencyResolution = ResolutionScope.COMPILE,
+requiresDependencyCollection = ResolutionScope.COMPILE) // (since Maven 3.0))
 public final class HermodGeneratorMojo extends AbstractMojo {
 
     // Parser options
@@ -34,33 +34,41 @@ public final class HermodGeneratorMojo extends AbstractMojo {
     private String modelName;
 
     @Parameter(property = "packageToScan", defaultValue = "")
-    private String packageToScan = "";
+    private String packageToScan;
     
     // Generator options
-    
     @Parameter(property = "prefixInterfaceClass", defaultValue = "")
-    private String prefixInterfaceClass = "";
+    private String prefixInterfaceClass;
     
-    @Parameter(property = "prefixImplementationClass", defaultValue = "Hermod")
+    @Parameter(property = "prefixImplementationClass", defaultValue = "Default")
     private String prefixImplementationClass;
 
-    @Parameter(property = "suffixImplementationPackage", defaultValue = "hermod")
+    @Parameter(property = "suffixImplementationPackage", defaultValue = "impl")
     private String suffixImplementationPackage;
 
     @Parameter(property = "serializedImplementationClass", defaultValue = "com.github.hermod.ser.impl.KeyObjectMsg")
-    private final String serializedImplementationClass = "com.github.hermod.ser.impl.KeyObjectMsg";
-
+    private String serializedImplementationClass;
 
     @Parameter(property = "generateFileForEachClass", defaultValue = "true")
     private boolean generateFileForEachClass;
     
+    @Parameter(property = "generateImplementation", defaultValue = "true")
+    private boolean generateImplementation;
+
     @Parameter(property = "implementationTemplateFileName", defaultValue = "DefaultMessage.java.mustache")
     private String implementationTemplateFileName; // templateName.extension.mustache don't generate is blank
+    
+    @Parameter(property = "generateInterface", defaultValue = "false")
+    private boolean generateInterface;
     
     @Parameter(property = "interfaceTemplateFileName", defaultValue = "Message.java.mustache")
     private String interfaceTemplateFileName; // templateName.extension.mustache don't generate is blank
     
-    @Parameter(property = "outputDir", defaultValue = "${project.build.directory}/generated-sources/hermod")
+    @Parameter(property = "generatePackageLayoutInOutputDir", defaultValue = "true")
+    private boolean generatePackageLayoutInOutputDir;
+    
+    
+    @Parameter(property = "outputDir", defaultValue = "${project.build.directory}/generated-sources/")
     private String outputDir;
     
     /**
@@ -71,6 +79,12 @@ public final class HermodGeneratorMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException {
         getLog().info("HermodGenerator started.");
+        if (this.packageToScan == null) {
+            this.packageToScan = "";
+        }
+        if (this.prefixInterfaceClass == null) {
+            this.prefixInterfaceClass = "";
+        }
         final Parser classParser = new AnnotatedClassParser();
         final Validator<ClassContainerDescriptor> validator = new ClassContainerDescriptorValidator();
         final Generator generator = new MustacheGenerator();
@@ -85,14 +99,15 @@ public final class HermodGeneratorMojo extends AbstractMojo {
                 getLog().error(error);
             }
             getLog().error("Model is invalid (see errors above).");
+            throw new IllegalArgumentException("Model is invalid");
         } else {
-            if (this.interfaceTemplateFileName != null && !"".equals(this.interfaceTemplateFileName)) {
-                generator.generateSourceClasses(classContainerDescriptor, this.outputDir, this.interfaceTemplateFileName,
-                        this.generateFileForEachClass, ClassType.INTERFACE);
+            if (this.generateInterface) {
+                generator.generateSourceClasses(classContainerDescriptor, this.outputDir, this.generatePackageLayoutInOutputDir,
+                        this.interfaceTemplateFileName, this.generateFileForEachClass, ClassType.INTERFACE);
             }
-            if (this.implementationTemplateFileName != null && !"".equals(this.implementationTemplateFileName)) {
-                generator.generateSourceClasses(classContainerDescriptor, this.outputDir, this.implementationTemplateFileName,
-                        this.generateFileForEachClass, ClassType.CLASS);
+            if (this.generateImplementation) {
+                generator.generateSourceClasses(classContainerDescriptor, this.outputDir, this.generatePackageLayoutInOutputDir,
+                        this.implementationTemplateFileName, this.generateFileForEachClass, ClassType.CLASS);
             }
         }
         getLog().info("HermodGenerator ended.");

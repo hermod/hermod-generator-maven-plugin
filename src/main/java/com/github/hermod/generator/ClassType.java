@@ -7,5 +7,5 @@ package com.github.hermod.generator;
  *
  */
 public enum ClassType {
-    INTERFACE, CLASS
+    INTERFACE, CLASS, BASIC
 }
