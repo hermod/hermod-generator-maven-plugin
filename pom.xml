@@ -13,6 +13,7 @@
 		<projectUrl>${parentUrl}</projectUrl>
 		<mavenVersion>3.0.0</mavenVersion>
 	</properties>
+	
 	<dependencies>
 		<dependency>
 			<groupId>com.github.hermod</groupId>
