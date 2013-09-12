@@ -1,5 +1,8 @@
 package com.github.hermod.generator;
 
+import java.io.File;
+import java.io.IOException;
+
 import com.github.hermod.generator.model.ClassContainerDescriptor;
 
 
@@ -18,7 +21,8 @@ public interface Generator {
      * @param templateFileName
      * @param aGeneratedClassType TODO
      * @param classDescriptors
+     * @throws IOException 
      */
-    public void generateSourceClasses(final ClassContainerDescriptor classContainerDescriptor, final String outputDir, boolean generatePackageInOutputDir, final String templateFileName, final boolean generateOneFileForEachClass, final ClassType aGeneratedClassType);
+    public void generateSourceClasses(final ClassContainerDescriptor classContainerDescriptor, final File outputDir, boolean generatePackageInOutputDir, final File templateFileName, final boolean generateOneFileForEachClass, final ClassType aGeneratedClassType) throws IOException;
     
 }
