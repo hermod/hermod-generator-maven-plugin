@@ -1,7 +1,7 @@
 package com.github.hermod.generator;
 
 import java.io.File;
-import java.util.List;
+import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -9,7 +9,6 @@ import com.github.hermod.generator.impl.AnnotatedClassParser;
 import com.github.hermod.generator.impl.ClassContainerDescriptorValidator;
 import com.github.hermod.generator.impl.MustacheGenerator;
 import com.github.hermod.generator.model.ClassContainerDescriptor;
-import com.github.hermod.ser.descriptor.AInterface;
 import com.github.hermod.ser.descriptor.AMessage;
 
 
@@ -39,15 +38,16 @@ public final class HermodGeneratorDemo {
     
     private static String name = "";// useful if generateFileForEachClass=false  // StringUtils.substringBefore(templateFileName, ".")
     
-    private static String outputDir = "./target/generated-sources/hermod"; // 
+    private static File outputDir = new File("./target/generated-sources/hermod"); // 
     
     
     /**
      * main.
      * 
      * @param args
+     * @throws IOException 
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         final Parser classParser = new AnnotatedClassParser();
         final Validator<ClassContainerDescriptor> validator = new ClassContainerDescriptorValidator();
         final Generator generator = new MustacheGenerator();
@@ -65,7 +65,7 @@ public final class HermodGeneratorDemo {
                 "");
         
         generator.generateSourceClasses(classContainerDescriptor, outputDir, false,
-                "/home/anavarro/workspace/hermod-generator-maven-plugin-sampleb/messages-doc.xdoc.mustache", true, ClassType.BASIC);
+                new File("/home/anavarro/workspace/hermod-generator-maven-plugin-sampleb/messages-doc.xdoc.mustache"), true, ClassType.BASIC);
         
         
         /*
