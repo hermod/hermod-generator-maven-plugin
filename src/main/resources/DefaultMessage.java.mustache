@@ -1,51 +1,65 @@
 {{#class}}
 package {{implementationPackageName}};
 
-import com.github.hermod.ser.IMsg;
 import {{interfacePackageName}}.*;
+{{#containsUuid}}
+import java.util.UUID;
+{{/containsUuid}}
+{{#ContainsIMsg}}
+import com.github.hermod.ser.Msg;
+{{/ContainsIMsg}}
 
-public final class {{implementationName}} extends {{implementationClass}} implements {{interfaceName}}
+/**
+ * {{implementationName}}
+ *
+ * <code>{{docName}} = {{id}}</code>
+ * 
+ * @author 
+ * 
+ */
+ public final class {{implementationName}} extends {{implementationClass}} implements {{interfaceName}}
 {
-    private final static int {{upperName}}_MSGID = {{id}};
-    
 {{#fields}}
-    private final static int {{upperName}}_ID = {{id}};
+    private final static int {{docName}} = {{id}};
 {{/fields}}
 
-    public int getMsgId() {
-        return {{upperName}}_MSGID;
-    }
-    
 {{#fields}}
     @Override
-    public {{type}} get{{capitalizeName}}() 
+    public {{type}}{{#isArray}}[]{{/isArray}} get{{capitalizeName}}() 
     {
     	{{#isBasicType}}
-        return this.getAs{{capitalizeType}}({{upperName}}_ID);
+        return this.getAs{{capitalizeType}}{{#isArray}}s{{/isArray}}({{docName}});
         {{/isBasicType}}
         {{#isEnum}}
-        return {{type}}.values()[this.getAsByte({{upperName}}_ID)];
+        return {{type}}.values()[this.getAsInt({{docName}})];
         {{/isEnum}}
+        {{#isUuid}}
+        return uuidFromBytes(this.getAsBytes({{docName}}));
+        {{/isUuid}}
         {{#isMessage}}
-        final {{prefixImplementationName}}{{type}} aMsg = new {{prefixImplementationName}}{{type}}();
-        this.getAsMsg({{upperName}}_ID, (IMsg) aMsg);
+        final {{type}} aMsg = new {{implementationClass}}();
+        this.getAsMsg({{docName}}, (Msg) aMsg);
         return ({{type}}) aMsg;
         {{/isMessage}}
     }
     
     @Override
-    public void set{{capitalizeName}}(final {{type}} a{{capitalizeName}}) 
+    public void set{{capitalizeName}}(final {{type}}{{#isArray}}[]{{/isArray}} a{{capitalizeName}}) 
     {
         {{#isBasicType}}
-        this.set({{upperName}}_ID, a{{capitalizeName}});
+        this.set({{docName}}, a{{capitalizeName}});
         {{/isBasicType}}
         {{#isEnum}}
-        this.set({{upperName}}_ID, a{{capitalizeName}}.ordinal());
+        this.set({{docName}}, a{{capitalizeName}}.ordinal());
         {{/isEnum}}
+        {{#isUuid}}
+        this.set({{docName}}, uuidAsBytes(a{{capitalizeName}}));
+        {{/isUuid}}
+        
 		{{#isMessage}}
-	    if (a{{capitalizeName}} instanceof IMsg) 
+	    if (a{{capitalizeName}} instanceof Msg) 
         {
-            this.set({{upperName}}_ID, (IMsg) a{{capitalizeName}});
+            this.set({{docName}}, (Msg) a{{capitalizeName}});
         }
 		{{/isMessage}}
     }
