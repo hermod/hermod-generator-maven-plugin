@@ -1,0 +1,151 @@
+package com.github.hermod.generator;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProject;
+
+import com.github.hermod.generator.impl.AnnotatedClassParser;
+import com.github.hermod.generator.impl.ClassContainerDescriptorValidator;
+import com.github.hermod.generator.impl.MustacheGenerator;
+import com.github.hermod.generator.model.ClassContainerDescriptor;
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
+
+/**
+ * <p>
+ * HermodGeneratorMojo.
+ * </p>
+ * 
+ * @author anavarro - Mar 20, 2013
+ * 
+ */
+@Mojo(name = "annotation-generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES, requiresDependencyResolution = ResolutionScope.COMPILE_PLUS_RUNTIME, requiresDependencyCollection = ResolutionScope.COMPILE_PLUS_RUNTIME)
+// (since Maven 3.0))
+public final class AnnotatedGeneratorMojo
+    extends AbstractHermodMojo
+{
+    @Parameter(property = "templateFileName", defaultValue = "${project.directory}/src/main/resources/template.java.mustache")
+    private File   templateFileName;  // templateName.extension.mustache don't generate is blank
+                                       
+    @Parameter(property = "outputDir", defaultValue = "${project.build.directory}/generated-sources")
+    private File   outputDir;
+    
+    @Parameter(property = "modelInput", required = true)
+    private String modelInput;
+    
+    @Parameter(defaultValue = "${project.artifacts}", required = true, readonly = true)
+    protected Set<Artifact> projectArtifacts;
+    
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.apache.maven.plugin.Mojo#execute()
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public void execute() throws MojoExecutionException
+    {
+        if (skip)
+        {
+            getLog().info("HermodBasicGeneratorMojo skipped (see conf).");
+            return;
+        }
+        
+        getLog().info("HermodBasicGeneratorMojo:annotation-generate started.");
+        
+        outputDir.mkdirs();
+        if (!outputDir.exists())
+            throw new MojoExecutionException("Impossible to create Output dir: {}" + outputDir);
+        
+        if (modelInput == null)
+            throw new MojoExecutionException("modelInput must be set");
+        
+        for (Object value: project.getCompileDependencies())
+        {
+            System.err.println(value);
+        }
+        
+        try
+        {
+            configurePluginClasspath();
+            final Class<?> clazz = Class.forName(modelInput, true, Thread.currentThread().getContextClassLoader());
+            if (!Map.class.isAssignableFrom(clazz))
+                throw new MojoExecutionException(modelInput + " doesn't implement Map<String, Object>");
+            
+            final File templateFile = templateFileName;
+            if (!templateFile.exists())
+                throw new MojoExecutionException("Template file doesn't exist: " + templateFile.getAbsolutePath());
+            
+            final Matcher match = scan(templateFile.getName());
+            if (!match.matches())
+                throw new MojoExecutionException("template file doesn't match the patter: '(.*).extension.mustache' : "
+                                                 + templateFile.getName());
+            
+            outputDir = new File(outputDir, match.group(1)+"."+match.group(2));
+            outputDir.createNewFile();
+            getLog().info("start Generation based on " + templateFileName + " , " + outputDir);
+            final Map<String, Object> scopeMap = new HashMap<String, Object>();
+            scopeMap.put("capitalize", MustacheGenerator.capitalizeFunction);
+            scopeMap.put("upper", MustacheGenerator.upperFunction);
+            scopeMap.putAll(((Map<String, Object>) clazz.newInstance()));
+
+            final Writer writer = new OutputStreamWriter(new FileOutputStream(outputDir, false));
+            final MustacheFactory mf = new DefaultMustacheFactory();
+            
+            Mustache mustache = null;
+            if (templateFileName.exists())
+            {
+                mustache = mf.compile(new FileReader(templateFileName), templateFileName.getName());
+            }
+            else
+            {
+                getLog().error("File not found, we are looking up into classpath: " + templateFileName.getName());
+                mustache = mf.compile(templateFileName.getName());
+            }
+            mustache.execute(writer, scopeMap);
+            writer.flush();
+            getLog().info(outputDir + " generated.");
+        }
+        catch (IOException e)
+        {
+            getLog().warn("Impossible to generate e=", e);
+        }
+        catch (Exception aException) {
+            getLog().error(aException);
+            throw new MojoExecutionException("Failed to instanciate " + modelInput);
+        }
+        getLog().info("HermodBasicGeneratorMojo ended.");
+    }
+    
+    private static Matcher scan(String aText)
+    {
+        final Pattern p = Pattern.compile("(.*)\\.(.*)\\.(mustache)$");
+        return p.matcher(aText);
+    }
+    
+}
