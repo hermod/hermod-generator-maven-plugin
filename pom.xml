@@ -8,6 +8,10 @@
     <artifactId>hermod-generator-maven-plugin</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
+    <scm>
+		<connection>scm:git:git://github.com/hermod/${project.artifactId}.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/hermod/${project.artifactId}.git</developerConnection>
+  	</scm>
     <properties>
         <projectUrl>${parentUrl}</projectUrl>
         <mavenVersion>3.0.0</mavenVersion>
