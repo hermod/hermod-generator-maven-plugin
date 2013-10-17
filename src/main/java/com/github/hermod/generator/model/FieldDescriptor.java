@@ -34,11 +34,13 @@ public final class FieldDescriptor
     private final boolean        isEnum;
     private final boolean        isArray;
     private final boolean        isBasicType;
+    private final boolean        isWrappedType;
     private final boolean        isMessage;
     private final boolean        isUuid;
     
     // TODO maybe move in hermod-ser
-    private final List<Class<?>> BASIC_MANAGED_TYPES = Arrays.<Class<?>> asList(boolean.class,
+    private final List<Class<?>> BASIC_MANAGED_TYPES = Arrays.<Class<?>> asList(
+                                                                                boolean.class,
                                                                                 byte.class,
                                                                                 short.class,
                                                                                 int.class,
@@ -46,6 +48,14 @@ public final class FieldDescriptor
                                                                                 double.class,
                                                                                 float.class,
                                                                                 String.class);
+    // TODO maybe move in hermod-ser
+    private final List<Class<?>> WRAPPED_MANAGED_TYPES = Arrays.<Class<?>> asList(
+                                                                                Double.class,
+                                                                                Integer.class,
+                                                                                Byte.class,
+                                                                                Long.class,
+                                                                                Short.class,
+                                                                                Float.class);
     
     /**
      * Constructor.
@@ -79,6 +89,7 @@ public final class FieldDescriptor
             this.type = classInsideArray.getSimpleName();
             this.isEnum = classInsideArray.isEnum();
             this.isBasicType = BASIC_MANAGED_TYPES.contains(classInsideArray) ? true : false;
+            this.isWrappedType = WRAPPED_MANAGED_TYPES.contains(classInsideArray) ? true : false;
             this.isMessage = (classInsideArray.getAnnotation(AMessage.class) != null || classInsideArray.equals(Msg.class) || Arrays
                     .<Class<?>> asList(classInsideArray.getInterfaces()).contains(Msg.class)) ? true : false;
         }
@@ -87,6 +98,7 @@ public final class FieldDescriptor
             this.type = aClazz.getSimpleName();
             this.isEnum = aClazz.isEnum();
             this.isBasicType = BASIC_MANAGED_TYPES.contains(aClazz) ? true : false;
+            this.isWrappedType = WRAPPED_MANAGED_TYPES.contains(aClazz) ? true : false;
             this.isMessage = (aClazz.getAnnotation(AMessage.class) != null || aClazz.equals(Msg.class) || Arrays
                     .<Class<?>> asList(aClazz.getInterfaces()).contains(Msg.class)) ? true : false;
         }
@@ -110,12 +122,13 @@ public final class FieldDescriptor
         // Preconditions.checkArgument(this.isEnum || this.isBasicType || this.isMessage,
         // "The type=%s for field name=%s must be a BasicType (%s) or an Enum or a Message", this.type, this.name,
         // this.BASIC_MANAGED_TYPES.toString());
-        if (!(this.isEnum || this.isBasicType || this.isMessage || this.isUuid))
+        if (!(this.isEnum || this.isBasicType || this.isMessage || this.isUuid || this.isWrappedType))
         {
-            errors.add(String.format("The type=%s for field name=%s must be a BasicType (%s) or an Enum or a Message",
+            errors.add(String.format("The type=%s for field name=%s must be a BasicType (%s) or an Enum or a Message or WrappedType",
                                      this.type,
                                      this.name,
-                                     this.BASIC_MANAGED_TYPES.toString()));
+                                     this.BASIC_MANAGED_TYPES.toString(),
+                                     this.WRAPPED_MANAGED_TYPES.toString()));
         }
         return errors;
     }
@@ -243,6 +256,16 @@ public final class FieldDescriptor
     public boolean isBasicType()
     {
         return this.isBasicType;
+    }
+    
+    /**
+     * isWrappedType.
+     * 
+     * @return
+     */
+    public boolean isWrappedType()
+    {
+        return this.isWrappedType;
     }
     
     /**
