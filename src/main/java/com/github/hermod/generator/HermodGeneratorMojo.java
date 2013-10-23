@@ -4,13 +4,11 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.apache.maven.project.MavenProject;
 
 import com.github.hermod.generator.impl.AnnotatedClassParser;
 import com.github.hermod.generator.impl.ClassContainerDescriptorValidator;
@@ -140,7 +138,9 @@ public final class HermodGeneratorMojo
                                                 this.generatePackageLayoutInOutputDir,
                                                 this.interfaceTemplateFileName,
                                                 this.generateFileForEachClass,
-                                                ClassType.INTERFACE);
+                                                ClassType.INTERFACE,
+                                                updateMustachScope()
+                                                );
             }
             if (this.generateImplementation)
             {
@@ -149,7 +149,8 @@ public final class HermodGeneratorMojo
                                                 this.generatePackageLayoutInOutputDir,
                                                 this.implementationTemplateFileName,
                                                 this.generateFileForEachClass,
-                                                ClassType.CLASS);
+                                                ClassType.CLASS,
+                                                updateMustachScope());
             }
             }
             catch (Exception aException) {
