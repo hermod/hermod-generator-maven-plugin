@@ -2,6 +2,7 @@ package com.github.hermod.generator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -65,7 +66,7 @@ public final class HermodGeneratorDemo {
                 "");
         
         generator.generateSourceClasses(classContainerDescriptor, outputDir, false,
-                new File("/home/anavarro/workspace/hermod-generator-maven-plugin-sampleb/messages-doc.xdoc.mustache"), true, ClassType.BASIC);
+                new File("/home/anavarro/workspace/hermod-generator-maven-plugin-sampleb/messages-doc.xdoc.mustache"), true, ClassType.BASIC, Collections.<String, Object>emptyMap());
         
         
         /*
