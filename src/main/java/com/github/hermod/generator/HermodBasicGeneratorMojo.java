@@ -1,12 +1,10 @@
 package com.github.hermod.generator;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -123,9 +121,10 @@ public final class HermodBasicGeneratorMojo
                                                 this.generatePackageLayoutInOutputDir,
                                                 this.templateFileName,
                                                 this.generateFileForEachClass,
-                                                ClassType.BASIC);
+                                                ClassType.BASIC,
+                                                updateMustachScope());
             }
-            catch (IOException aException)
+            catch (Exception aException)
             {
                 throw new MojoExecutionException("Generate Failed", aException);
             }
