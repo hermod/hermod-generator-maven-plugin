@@ -36,42 +36,42 @@ public final class MustacheGenerator
     implements Generator
 {
     
-    private static final Logger            LOGGER             = LoggerFactory.getLogger(MustacheGenerator.class);
+    private static final Logger                  LOGGER             = LoggerFactory.getLogger(MustacheGenerator.class);
     
     final public static Function<String, String> capitalizeFunction = new Function<String, String>()
-                                                              {
-                                                                  
-                                                                  /**
-                                                                   * apply.
-                                                                   * 
-                                                                   * @param aInput
-                                                                   * @return
-                                                                   */
-                                                                  public String apply(String aInput)
-                                                                  {
-                                                                      return StringUtils.capitalize(aInput);
-                                                                  }
-                                                                  
-                                                              };
+                                                                    {
+                                                                        
+                                                                        /**
+                                                                         * apply.
+                                                                         * 
+                                                                         * @param aInput
+                                                                         * @return
+                                                                         */
+                                                                        public String apply(String aInput)
+                                                                        {
+                                                                            return StringUtils.capitalize(aInput);
+                                                                        }
+                                                                        
+                                                                    };
     
     /**
      * substring1Function
      */
     final public static Function<String, String> upperFunction      = new Function<String, String>()
-                                                              {
-                                                                  
-                                                                  /**
-                                                                   * apply.
-                                                                   * 
-                                                                   * @param aInput
-                                                                   * @return
-                                                                   */
-                                                                  public String apply(String aInput)
-                                                                  {
-                                                                      return aInput.toUpperCase();
-                                                                  }
-                                                                  
-                                                              };
+                                                                    {
+                                                                        
+                                                                        /**
+                                                                         * apply.
+                                                                         * 
+                                                                         * @param aInput
+                                                                         * @return
+                                                                         */
+                                                                        public String apply(String aInput)
+                                                                        {
+                                                                            return aInput.toUpperCase();
+                                                                        }
+                                                                        
+                                                                    };
     
     /**
      * generateClasses.
@@ -80,15 +80,16 @@ public final class MustacheGenerator
      * @param aOutputDir
      * @param aTemplateFileName
      * @param generateOneFileForEachClasses
-     * @throws IOException 
+     * @throws IOException
      */
     public void generateSourceClasses(final ClassContainerDescriptor classContainerDescriptor, File aOutputDir,
                                       boolean generatePackageLayoutInOutputDir, File aTemplateFileName,
-                                      boolean generateOneFileForEachClass, final ClassType aGeneratedClassType) throws IOException
+                                      boolean generateOneFileForEachClass, final ClassType aGeneratedClassType,
+                                      Map<String, Object> enrichedScope) throws IOException
     {
         LOGGER.info("MustacheGenerator.generateClasses started.");
-//        if (!aTemplateFileName.exists())
-//            throw new IllegalArgumentException("Template file doesn't exist: " + aTemplateFileName.getAbsolutePath());
+        // if (!aTemplateFileName.exists())
+        // throw new IllegalArgumentException("Template file doesn't exist: " + aTemplateFileName.getAbsolutePath());
         
         final Matcher match = scan(aTemplateFileName.getName());
         if (!match.matches())
@@ -97,7 +98,8 @@ public final class MustacheGenerator
         
         final String normalizedName = match.group(1) + "." + match.group(2);
         final String packageDir = ((generatePackageLayoutInOutputDir) ? classContainerDescriptor.getPackageName(aGeneratedClassType)
-                .replace(".", File.separator) + File.separator : "");
+                                                                                                .replace(".", File.separator)
+                                                                        + File.separator : "");
         final File outputPackage = new File(aOutputDir, packageDir);
         outputPackage.mkdirs();
         
@@ -105,9 +107,14 @@ public final class MustacheGenerator
         {
             for (final ClassDescriptor aClassDescription : classContainerDescriptor.getClasses())
             {
-                final File output = new File(outputPackage, aClassDescription.getName(aGeneratedClassType)+"."+match.group(2));
+                final File output = new File(outputPackage, aClassDescription.getName(aGeneratedClassType) + "." + match.group(2));
                 output.createNewFile();
-                generateSourceClass(aClassDescription, output, generatePackageLayoutInOutputDir, aTemplateFileName, aGeneratedClassType);
+                generateSourceClass(aClassDescription,
+                                    output,
+                                    generatePackageLayoutInOutputDir,
+                                    aTemplateFileName,
+                                    aGeneratedClassType,
+                                    enrichedScope);
             }
         }
         else
@@ -118,7 +125,8 @@ public final class MustacheGenerator
                                 output,
                                 generatePackageLayoutInOutputDir,
                                 aTemplateFileName,
-                                aGeneratedClassType);
+                                aGeneratedClassType,
+                                enrichedScope);
         }
         
         LOGGER.info("MustacheGenerator.generateClasses ended.");
@@ -133,72 +141,33 @@ public final class MustacheGenerator
      *            TODO
      * @param templateFileName
      */
-    public void generateSourceClass(final ClassDescriptor classDescriptor, final File outputDir,
-                                    boolean generatePackageLayoutInOutputDir, final File templateFileName,
-                                    final ClassType aGeneratedClassType)
+    public void generateSourceClass(final ClassDescriptor classDescriptor, final File outputDir, boolean generatePackageLayoutInOutputDir,
+                                    final File templateFileName, final ClassType aGeneratedClassType,
+                                    final Map<String, Object> enrichedScope)
     {
         LOGGER.info("start Generation based on {}, {}", templateFileName, outputDir);
         final Map<String, Object> scopeMap = new HashMap<String, Object>();
-        scopeMap.put("capitalize", this.capitalizeFunction);
-        scopeMap.put("upper", this.upperFunction);
+        scopeMap.put("capitalize", capitalizeFunction);
+        scopeMap.put("upper", upperFunction);
         scopeMap.put("class", classDescriptor);
-        try
+        scopeMap.putAll(enrichedScope);
+        try (final Writer writer = new OutputStreamWriter(new FileOutputStream(outputDir)))
         {
-//            Preconditions.checkArgument(StringUtils.endsWith(templateFileName, ".mustache"),
-//                                        "The templateFileName must end with .mustache.");
-//            final List<String> splitTemplateFileName = Lists.newArrayList(Splitter.on(".").split(templateFileName));
-//            // Preconditions
-//            // .checkArgument(splitTemplateFileName.size() == 3,
-//            // "The templateFileName must have 2 points (ended .mustache) to determine the extention of the file. Ex : interface-api.java.mustache.");
-//            final String extension = "." + splitTemplateFileName.get(splitTemplateFileName.size() - 2);
-//            
-///********************** */
-//            final File templateFile = new File(templateFileName);
-//            if (!templateFile.exists())
-//                throw new IllegalArgumentException("Template file doesn't exist: "+templateFile.getAbsolutePath());
-//            
-//            final Matcher match = scan(templateFile.getName());
-//            if (!match.matches())
-//                throw new IllegalArgumentException("template file doesn't match the patter: '(.*).extension.mustache' : "+templateFile.getName());
-//
-//            final String normalizedName = match.group(1)+"."+match.group(2);
-//
-///************************/
-//            
-//            File fOutputDir = new File(outputDir, ((generatePackageLayoutInOutputDir) ? classDescriptor.getPackageName(aGeneratedClassType)
-//                    .replace(".", File.separator) + File.separator : "")+"/"+
-//                    classDescriptor.getName()+"."+match.group(2));
-//            fOutputDir.mkdirs();
-            
-//            final String fileName = 
-//                    outputDir
-//                                    + File.separator
-//                                    + ((generatePackageLayoutInOutputDir) ? classDescriptor.getPackageName(aGeneratedClassType)
-//                                            .replace(".", File.separator) + File.separator : "")
-//                                    + normalizedName;
-//            Files.createParentDirs(new File(match.group(1)+""));
-            final Writer writer = new OutputStreamWriter(new FileOutputStream(outputDir));
             final MustacheFactory mf = new DefaultMustacheFactory();
             
             Mustache mustache = null;
-//            if (Thread.currentThread().getContextClassLoader().getResource(templateFileName) == null)
-//            {
-                //final File file = new File(templateFileName);
-                if (templateFileName.exists())
+            if (templateFileName.exists())
+            {
+                try (FileReader reader = new FileReader(templateFileName))
                 {
-                    mustache = mf.compile(new FileReader(templateFileName), templateFileName.getName());
+                    mustache = mf.compile(reader, templateFileName.getName());
                 }
-                else
-                {
-                    LOGGER.info("File not found, we are looking up into classpath: ", templateFileName.getName());
-                    mustache = mf.compile(templateFileName.getName());
-//                    throw new IllegalArgumentException("The file " + templateFileName + " does not exist. You must specify a real file.");
-                }
-//            }
-//            else
-//            {
-//                mustache = mf.compile(templateFileName);
-//            }
+            }
+            else
+            {
+                LOGGER.info("File not found, we are looking up into classpath: ", templateFileName.getName());
+                mustache = mf.compile(templateFileName.getName());
+            }
             mustache.execute(writer, scopeMap);
             writer.flush();
             LOGGER.info(outputDir + " generated.");
