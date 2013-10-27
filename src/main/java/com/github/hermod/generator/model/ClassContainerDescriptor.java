@@ -25,6 +25,7 @@ public final class ClassContainerDescriptor
     private final List<ClassDescriptor> classes;
     private final List<ClassDescriptor> sentByClient;
     private final List<ClassDescriptor> sentByServer;
+    private final List<EnumDescriptor> enums;
     
     /**
      * Constructor.
@@ -45,7 +46,7 @@ public final class ClassContainerDescriptor
      */
     public ClassContainerDescriptor(final String aJavaName, final String aName, final int aId, final String aPrefixImplementationName,
                                     final String aPrefixInterfaceName, String aSuffixImplementationPackageName,
-                                    String aSerializableImplementationClass, final List<ClassDescriptor> aClasses, final String aPackageName)
+                                    String aSerializableImplementationClass, final List<ClassDescriptor> aClasses, final List<EnumDescriptor> aEnums, final String aPackageName)
     {
         super(aJavaName,
               aName,
@@ -82,6 +83,9 @@ public final class ClassContainerDescriptor
                 sentByServer.add(desc);
         }
         
+        enums = new ArrayList<>();
+        enums.addAll(aEnums);
+        
         
         // this.validate();
     }
@@ -95,10 +99,10 @@ public final class ClassContainerDescriptor
      */
     public ClassContainerDescriptor(final String aJavaName, final String aName, final int id, final String aPrefixImplementationName,
                                     final String aPrefixInterfaceName, String aSerializableImplementationClass,
-                                    final List<ClassDescriptor> aClasses)
+                                    final List<ClassDescriptor> aClasses,final List<EnumDescriptor> aEnums)
     {
         this(aJavaName, aName, id, aPrefixImplementationName, aPrefixInterfaceName, (aClasses != null && aClasses.size() >= 1) ? aClasses
-                .get(0).getSuffixImplementationPackageName() : "", null, aClasses, (aClasses != null && aClasses.size() >= 1) ? aClasses
+                .get(0).getSuffixImplementationPackageName() : "", null, aClasses, aEnums, (aClasses != null && aClasses.size() >= 1) ? aClasses
                 .get(0).getPackageName() : "");
     }
     
@@ -178,5 +182,10 @@ public final class ClassContainerDescriptor
     public List<ClassDescriptor> getSentByServer()
     {
         return sentByServer;
+    }
+    
+    public List<EnumDescriptor> getEnums()
+    {
+        return enums;
     }
 }
