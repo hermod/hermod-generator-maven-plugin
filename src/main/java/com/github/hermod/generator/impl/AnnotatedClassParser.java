@@ -5,7 +5,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -61,6 +60,8 @@ public final class AnnotatedClassParser
             annotatedClass = (Class<? extends Annotation>) Class.forName(modelName);
             final List<Class<?>> classes = new ArrayList<Class<?>>(reflections.getTypesAnnotatedWith(annotatedClass));
             final List<ClassDescriptor> messageDescriptors = new ArrayList<>(classes.size());
+            final List<Class<?>> enums = new ArrayList<Class<?>>(reflections.getTypesAnnotatedWith(AEnum.class));
+            final List<EnumDescriptor> enumsDescriptors = new ArrayList<>(enums.size());
             for (int i = 0; i < classes.size(); i++)
             {
                 final Class<?> clazz = classes.get(i);
@@ -74,13 +75,21 @@ public final class AnnotatedClassParser
                 
                 messageDescriptors.add(messageDescriptor);
             }
+            
+            for (Class<?> clazzEnum: enums)
+            {
+                if (clazzEnum.isEnum())
+                    enumsDescriptors.add(new EnumDescriptor((Class<Enum<?>>) clazzEnum));
+            }
+            
             final ClassContainerDescriptor classContainerDescriptor = new ClassContainerDescriptor("NotUsed",
                                                                                                    aName,
                                                                                                    1,
                                                                                                    aPrefixImplementationName,
                                                                                                    aPrefixInterfaceName,
                                                                                                    aSerializedImplementationClass,
-                                                                                                   messageDescriptors);
+                                                                                                   messageDescriptors,
+                                                                                                   enumsDescriptors);
             LOGGER.info("classContainerDescriptor=" + classContainerDescriptor);
             LOGGER.info("AnnotatedClassParser.parse() ended.");
             return classContainerDescriptor;
