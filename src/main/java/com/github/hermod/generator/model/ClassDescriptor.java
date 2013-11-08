@@ -340,6 +340,12 @@ public class ClassDescriptor
     {
         return this.fields;
     }
+
+    public DecoratedCollection<FieldDescriptor> enumerateFields()
+    {
+        return new DecoratedCollection<>(this.fields);
+    }
+
     
     /**
      * Returns the enums.
@@ -350,7 +356,12 @@ public class ClassDescriptor
     {
         return enums;
     }
-    
+
+    public DecoratedCollection<EnumDescriptor> enumerateEnums()
+    {
+        return new DecoratedCollection<>(enums);
+    }
+
     /**
      * getPrefix.
      * 
@@ -391,6 +402,12 @@ public class ClassDescriptor
         return this.methods;
     }
     
+    public DecoratedCollection<MethodDescriptor> enumerateMethods()
+    {
+        return new DecoratedCollection<>(this.methods);
+    }
+    
+    
     /**
      * getResponseMessages.
      * 
@@ -400,6 +417,12 @@ public class ClassDescriptor
     {
         return this.responseMessages;
     }
+
+    public DecoratedCollection<AMessage> enumerateResponseMessages()
+    {
+        return new DecoratedCollection<>(this.responseMessages);
+    }
+
     
     /**
      * Returns the isContainsIMsg.
@@ -431,6 +454,11 @@ public class ClassDescriptor
         return sentBy;
     }
     
+    public DecoratedCollection<ESender> enumerateSentBy()
+    {
+        return new DecoratedCollection<>(sentBy);
+    }
+
     /**
      * (non-Javadoc)
      * 
