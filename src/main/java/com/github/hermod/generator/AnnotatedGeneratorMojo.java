@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -37,11 +36,18 @@ import com.github.mustachejava.MustacheFactory;
 public final class AnnotatedGeneratorMojo
     extends AbstractHermodMojo
 {
-    @Parameter(property = "templateFileName", defaultValue = "${project.directory}/src/main/resources/template.java.mustache")
+    @Parameter(property = "templateFileName", defaultValue = "${basedir}/src/main/resources/template.java.mustache")
     private File            templateFileName; // templateName.extension.mustache don't generate is blank
                                               
     @Parameter(property = "outputDir", defaultValue = "${project.build.directory}/generated-sources")
     private File            outputDir;
+
+    @Parameter(property = "intputDir", defaultValue = "${project.build.directory}/generated-sources/hermod")
+    private File            intputDir;
+
+    @Parameter(property = "baseDir", defaultValue = "${basedir}")
+    private File            baseDir;
+
     
     @Parameter(defaultValue = "${project.artifacts}", required = true, readonly = true)
     protected Set<Artifact> projectArtifacts;
@@ -82,7 +88,7 @@ public final class AnnotatedGeneratorMojo
             if (!templateFile.exists())
                 throw new MojoExecutionException("Template file doesn't exist: " + templateFile.getAbsolutePath());
             
-            final Matcher match = scan(templateFile.getName());
+            final Matcher match = Util.scan(templateFile.getName());
             if (!match.matches())
                 throw new MojoExecutionException("template file doesn't match the patter: '(.*).extension.mustache' : "
                                                  + templateFile.getName());
@@ -94,6 +100,8 @@ public final class AnnotatedGeneratorMojo
             scopeMap.put("capitalize", MustacheGenerator.capitalizeFunction);
             scopeMap.put("upper", MustacheGenerator.upperFunction);
             scopeMap.putAll(updateMustachScope());
+            
+            Util.populateExistingFiles(scopeMap, intputDir, baseDir);
             
             try (final Writer writer = new OutputStreamWriter(new FileOutputStream(outputDir, false)))
             {
@@ -127,12 +135,6 @@ public final class AnnotatedGeneratorMojo
             throw new MojoExecutionException("Failed to instanciate " + modelInput);
         }
         getLog().info("HermodBasicGeneratorMojo ended.");
-    }
-    
-    private static Matcher scan(String aText)
-    {
-        final Pattern p = Pattern.compile("(.*)\\.(.*)\\.(mustache)$");
-        return p.matcher(aText);
     }
     
 }
