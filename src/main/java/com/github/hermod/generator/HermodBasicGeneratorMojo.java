@@ -3,7 +3,6 @@ package com.github.hermod.generator;
 import java.io.File;
 import java.util.List;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -81,7 +80,7 @@ public final class HermodBasicGeneratorMojo
         if (!templateFile.exists())
             throw new MojoExecutionException("Template file doesn't exist: "+templateFile.getAbsolutePath());
         
-        final Matcher match = scan(templateFile.getName());
+        final Matcher match = Util.scan(templateFile.getName());
         if (!match.matches())
             throw new MojoExecutionException("template file doesn't match the patter: '(.*).extension.mustache' : "+templateFile.getName());
 
@@ -132,10 +131,4 @@ public final class HermodBasicGeneratorMojo
         getLog().info("HermodBasicGeneratorMojo ended.");
     }
     
-    private static Matcher scan(String aText)
-    {
-        final Pattern p = Pattern.compile("(.*)\\.(.*)\\.(mustache)$");
-        return p.matcher(aText);
-    }
-
 }
