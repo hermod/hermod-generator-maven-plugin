@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.hermod.generator.ClassType;
 import com.github.hermod.generator.Generator;
+import com.github.hermod.generator.Util;
 import com.github.hermod.generator.model.ClassContainerDescriptor;
 import com.github.hermod.generator.model.ClassDescriptor;
 import com.github.mustachejava.DefaultMustacheFactory;
@@ -102,6 +103,7 @@ public final class MustacheGenerator
                                                                         + File.separator : "");
         final File outputPackage = new File(aOutputDir, packageDir);
         outputPackage.mkdirs();
+        Util.populateExistingFiles(enrichedScope, outputPackage, aOutputDir);
         
         if (generateOneFileForEachClass)
         {
@@ -129,9 +131,26 @@ public final class MustacheGenerator
                                 enrichedScope);
         }
         
+
+        
         LOGGER.info("MustacheGenerator.generateClasses ended.");
     }
-    
+
+//    protected final static void populateExistingFiles(Map<String, Object> enrichedScope, final File outputPackage, String packageDir)
+//    {
+//        File[] files = outputPackage.listFiles();
+//        Function<File, String> fileToString = new Function<File, String>()
+//        {
+//            @Override
+//            public String apply(File input)
+//            {
+//                return input.getAbsolutePath();
+//            }
+//        };
+//        Collection<String> filesStr =  Collections2.transform(Arrays.asList(files), fileToString);
+//        enrichedScope.put("files", filesStr);
+//    }
+//    
     /**
      * generateClass.
      * 
