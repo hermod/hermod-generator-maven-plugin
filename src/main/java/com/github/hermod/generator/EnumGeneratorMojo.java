@@ -6,9 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -20,15 +18,14 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.reflections.Reflections;
 
 import com.github.hermod.generator.impl.MustacheGenerator;
 import com.github.hermod.generator.model.EnumDescriptor;
-import com.github.hermod.ser.descriptor.AEnum;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 import com.google.common.base.Function;
+import com.google.common.base.Strings;
 
 /**
  * <p>
@@ -46,7 +43,7 @@ public final class EnumGeneratorMojo
     @Parameter(property = "templateFileName", defaultValue = "src/main/resources/Template-enum.java.mustache")
     private File            templateFileName;   // templateName.extension.mustache don't generate is blank
                                                  
-    @Parameter(property = "outputDir", defaultValue = "${project.build.directory}/generated-sources")
+    @Parameter(property = "outputDir", defaultValue = "${project.build.directory}/generated-sources/hermod")
     private File            outputDir;
     
     @Parameter(defaultValue = "${project.artifacts}", required = true, readonly = true)
@@ -54,6 +51,9 @@ public final class EnumGeneratorMojo
     
     @Parameter(property = "annotation", defaultValue = "com.github.hermod.ser.descriptor.AEnum")
     private String          annotation;
+    
+    @Parameter(property = "packageDir", defaultValue = "")
+    private String          packageDir;
     
     @Parameter(property = "callTemplatePerEnum", defaultValue = "true")
     private boolean         callTemplatePerEnum;
@@ -77,6 +77,11 @@ public final class EnumGeneratorMojo
         }
         
         getLog().info("HermodBasicGeneratorMojo:annotation-generate started.");
+        
+        if (!Strings.isNullOrEmpty(packageDir))
+        {
+            outputDir = new File(outputDir, packageDir);
+        }
         
         outputDir.mkdirs();
         if (!outputDir.exists())
@@ -117,7 +122,7 @@ public final class EnumGeneratorMojo
                     filenameMapper = (Function<String, String>) scopeMap.get(functName);
                     getLog().debug("Find filenameMapper for " + functName + ", " + functName);
                 }
-                for (EnumDescriptor desc : getEnums(packageToScan))
+                for (EnumDescriptor desc : Util.getEnums(packageToScan))
                 {
                     scopeMap.put("enumDescriptor", desc);
                     String fileNamePrefix = filenameMapper == null ? desc.getJavaName() : filenameMapper.apply(desc.getJavaName());
@@ -126,7 +131,7 @@ public final class EnumGeneratorMojo
             }
             else
             {
-                scopeMap.put("enumDescriptors", getEnums(packageToScan));
+                scopeMap.put("enumDescriptors", Util.getEnums(packageToScan));
                 writeFile(scopeMap, match.group(1) + "." + match.group(2));
             }
         }
@@ -178,22 +183,5 @@ public final class EnumGeneratorMojo
         {
             getLog().warn("Impossible to generate " + fileDir, e);
         }
-    }
-    
-    @SuppressWarnings("unchecked")
-    private final static List<EnumDescriptor> getEnums(final String aPackageName)
-    {
-        final Reflections reflections = new Reflections(Thread.currentThread()
-                                                              .getContextClassLoader(), aPackageName);
-        final List<Class<?>> enums = new ArrayList<Class<?>>(reflections.getTypesAnnotatedWith(AEnum.class));
-        final List<EnumDescriptor> enumsDescriptors = new ArrayList<>(enums.size());
-        
-        for (Class<?> clazzEnum : enums)
-        {
-            if (clazzEnum.isEnum())
-                enumsDescriptors.add(new EnumDescriptor((Class<Enum<?>>) clazzEnum));
-        }
-        
-        return enumsDescriptors;
     }
 }
