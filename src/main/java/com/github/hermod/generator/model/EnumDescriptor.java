@@ -1,6 +1,7 @@
 package com.github.hermod.generator.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import com.github.hermod.ser.descriptor.AEnum;
@@ -73,10 +74,18 @@ public final class EnumDescriptor
         return enumAnnotation == null ? "" : enumAnnotation.docComment();
     }
     
+    public DecoratedCollection<EnumFieldDescriptor> enumerateFields()
+    {
+        //return enumValues;
+        return new DecoratedCollection<EnumFieldDescriptor>(enumValues);
+    }
+
     public List<EnumFieldDescriptor> getFields()
     {
+        //return enumValues;
         return enumValues;
     }
+    
     
     /**
      * (non-Javadoc)
