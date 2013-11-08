@@ -162,6 +162,12 @@ public final class ClassContainerDescriptor
     {
         return this.classes;
     }
+    
+    public DecoratedCollection<ClassDescriptor> enumerateClasses()
+    {
+        return new DecoratedCollection<>(this.classes);
+    }
+    
 
     
     /**
@@ -173,6 +179,12 @@ public final class ClassContainerDescriptor
     {
         return sentByClient;
     }
+
+    public DecoratedCollection<ClassDescriptor> enumerateSentByClient()
+    {
+        return new DecoratedCollection<>(sentByClient);
+    }
+
     
     /**
      * Returns the sentByServer.
@@ -183,9 +195,20 @@ public final class ClassContainerDescriptor
     {
         return sentByServer;
     }
+
+    public DecoratedCollection<ClassDescriptor> enumerateSentByServer()
+    {
+        return new DecoratedCollection<>(sentByServer);
+    }
     
     public List<EnumDescriptor> getEnums()
     {
         return enums;
     }
+
+    public DecoratedCollection<EnumDescriptor> enumerateEnums()
+    {
+        return new DecoratedCollection<>(enums);
+    }
+
 }
